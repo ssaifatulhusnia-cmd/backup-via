@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kuis Yes/No — Teks Prosedur</title>
+  <style>
+    :root{
+      --brown-700:#5d4037;
+      --brown-600:#6d4c41;
+      --brown-500:#8d6e63;
+      --accent:#ffe0b2;
+      --success:#2e7d32;
+      --danger:#c62828;
+    }
+    html,body{height:100%;}
+    body {
+      margin:0;
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      background-color:#ffeb3b; /* kuning */
+      background-image: url('https://cdn.pixabay.com/photo/2017/03/02/22/10/duck-2117283_1280.jpg');
+      background-repeat:no-repeat;
+      background-position:center top;
+      background-size: contain;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:32px;
+    }
+
+    .card{
+      width:100%;
+      max-width:760px;
+      background:linear-gradient(180deg,var(--brown-700),var(--brown-600));
+      border-radius:14px;
+      padding:24px;
+      box-shadow:0 12px 30px rgba(0,0,0,0.35);
+      color:var(--accent);
+    }
+
+    h1{margin:0 0 8px 0;font-size:26px;text-align:center}
+    p.lead{margin:0 0 18px 0;text-align:center;color:#ffecd1}
+
+    .question{background:var(--brown-500);padding:14px;border-radius:10px;margin-bottom:12px;display:none}
+    .question.active{display:block}
+
+    .qtext{font-weight:700;margin-bottom:8px}
+    .options{display:flex;gap:18px;align-items:center}
+    label.opt{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.04);padding:8px 12px;border-radius:8px;cursor:pointer}
+    input[type="radio"]{width:16px;height:16px}
+
+    .controls{display:flex;gap:12px;margin-top:18px}
+    button{flex:1;padding:12px;border-radius:10px;border:0;background:#3e2723;color:white;font-weight:700;cursor:pointer}
+    button.secondary{background:transparent;border:1px solid rgba(255,255,255,0.12)}
+
+    #feedback{margin-top:14px;padding:10px;border-radius:8px;text-align:center;font-weight:700}
+
+    @media (max-width:520px){.options{flex-direction:column;align-items:flex-start}}
+  </style>
+</head>
+<body>
+  <main class="card" role="main" aria-labelledby="title">
+    <h1 id="title">Kuis Yes / No — Teks Prosedur</h1>
+    <p class="lead">Jawab setiap pertanyaan satu per satu dengan memilih <strong>yes</strong> atau <strong>no</strong>.</p>
+
+    <form id="quizForm" onsubmit="return false;">
+      <div class="question active" id="q1">
+        <div class="qtext">1. Apakah kamu pernah mendengar tentang teks prosedur?</div>
+        <div class="options">
+          <label class="opt"><input type="radio" name="q1" value="yes"> yes</label>
+          <label class="opt"><input type="radio" name="q1" value="no"> no</label>
+        </div>
+        <div class="controls">
+          <button type="button" class="nextBtn">Hasil</button>
+        </div>
+      </div>
+
+      <div class="question" id="q2">
+        <div class="qtext">2. Apakah teks prosedur termasuk teks sastra?</div>
+        <div class="options">
+          <label class="opt"><input type="radio" name="q2" value="yes"> yes</label>
+          <label class="opt"><input type="radio" name="q2" value="no"> no</label>
+        </div>
+        <div class="controls">
+          <button type="button" class="nextBtn">Hasil</button>
+        </div>
+      </div>
+
+      <div class="question" id="q3">
+        <div class="qtext">3. Apakah teks prosedur berisi langkah-langkah?</div>
+        <div class="options">
+          <label class="opt"><input type="radio" name="q3" value="yes"> yes</label>
+          <label class="opt"><input type="radio" name="q3" value="no"> no</label>
+        </div>
+        <div class="controls">
+          <button id="checkAll" type="button">Hasil</button>
+        </div>
+      </div>
+
+      <div id="feedback" role="status" aria-live="polite"></div>
+    </form>
+  </main>
+
+  <script>
+    (function(){
+      const answers = { q1: 'yes', q2: 'no', q3: 'yes' };
+      const feedback = document.getElementById('feedback');
+      const questions = document.querySelectorAll('.question');
+      let current = 0;
+
+      function showQuestion(index){
+        questions.forEach((q,i)=>q.classList.toggle('active', i===index));
+      }
+
+      document.querySelectorAll('.nextBtn').forEach((btn, index)=>{
+        btn.addEventListener('click', ()=>{
+          const qId = 'q'+(index+1);
+          const answer = (document.querySelector('input[name="'+qId+'"]:checked')||{}).value;
+          if(!answer){
+            feedback.textContent='Silakan pilih jawaban terlebih dahulu.';
+            feedback.style.background='rgba(255,255,255,0.06)';
+            feedback.style.color='#ffd';
+            return;
+          }
+          if(answer===answers[qId]){
+            feedback.textContent='Hebat!!! Jawaban anda benar';
+            feedback.style.background='rgba(46,125,50,0.12)';
+            feedback.style.color='#b9f6ca';
+            setTimeout(()=>{
+              feedback.textContent='';
+              showQuestion(index+1);
+            },1000);
+          } else {
+            feedback.textContent='Maaf jawaban anda salah, ulangi lagi';
+            feedback.style.background='rgba(198,40,40,0.12)';
+            feedback.style.color='#ffd7d7';
+          }
+        });
+      });
+
+      document.getElementById('checkAll').addEventListener('click',()=>{
+        const qId='q3';
+        const answer=(document.querySelector('input[name="'+qId+'"]:checked')||{}).value;
+        if(!answer){
+          feedback.textContent='Silakan pilih jawaban terlebih dahulu.';
+          feedback.style.background='rgba(255,255,255,0.06)';
+          feedback.style.color='#ffd';
+          return;
+        }
+        if(answer===answers[qId]){
+          feedback.textContent='Hebat!!! Jawaban anda benar';
+          feedback.style.background='rgba(46,125,50,0.12)';
+          feedback.style.color='#b9f6ca';
+        } else {
+          feedback.textContent='Maaf jawaban anda salah, ulangi lagi';
+          feedback.style.background='rgba(198,40,40,0.12)';
+          feedback.style.color='#ffd7d7';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
